@@ -11,10 +11,10 @@ public class PlayerMovement : MonoBehaviour
     Animator Animator_;
 
     public float MoveSpeed = 1.0f;
-    public float JumpSpeed = 1.0f;
+    public float JumpSpeed = 1.0f, JumpFrequency = 1.0f, NextJumpTime;
 
     bool FacingRight = true;
-    bool IsGrounded = false;
+    public bool IsGrounded = false;
 
     public Transform GroundCheck_Position;
     public float GroundCheck_Radius;
@@ -32,6 +32,7 @@ public class PlayerMovement : MonoBehaviour
     void Update()
     {
         HorizontalMove();
+        OnGroundedCheck();
 
         if (Rigidbody_.velocity.x < 0 && FacingRight)
         {
@@ -42,8 +43,9 @@ public class PlayerMovement : MonoBehaviour
             FlipFace();
         }
 
-        if (Input.GetAxis("Vertical") > 0)
+        if (Input.GetAxis("Vertical") > 0 && IsGrounded && (NextJumpTime < Time.timeSinceLevelLoad))
         {
+            NextJumpTime = Time.timeSinceLevelLoad + JumpFrequency;
             Jump();
         }
 
@@ -73,6 +75,7 @@ public class PlayerMovement : MonoBehaviour
     void OnGroundedCheck()
     {
         IsGrounded = Physics2D.OverlapCircle(GroundCheck_Position.position, GroundCheck_Radius, GroundCheck_Layer);
+        Animator_.SetBool("IsGroundedAnim", IsGrounded);
     }
 
 }
